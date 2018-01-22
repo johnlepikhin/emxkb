@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+if ( @ARGV < 3 ) {
+    die <<'END'
+Usage:
+
+exec_counter <status_file> <timeout> <command 1> [command 2] [command 3] ...
+END
+}
+
+my ( $status_file, $timeout, @commands ) = @ARGV;
+
+sub get () {
+    if ( open my $fh, q{<}, $status_file ) {
+        my $n = <$fh>;
+        chomp $n;
+        close $fh;
+        return $n;
+    }
+    return 0;
+}
+
+sub set ($) {
+    if ( open my $fh, q{>}, $status_file ) {
+        print {$fh} @_;
+        close $fh;
+    }
+}
+
+if ( -e $status_file && ( stat $status_file )[9] + $timeout < time ) {
+    unlink $status_file;
+}
+
+my $n = get();
+if ($n) {
+    if ($n) {
+        if ( $n < @commands ) {
+            system( $commands[$n] );
+            $n++;
+            set $n;
+        }
+    }
+}
+else {
+    system( $commands[0] );
+    my $n = 1;
+    set $n;
+    while (1) {
+        select undef, undef, undef, $timeout;
+        my $newn = get();
+        if ( !$newn || $newn == $n ) {
+            unlink $status_file;
+            exit 0;
+        }
+        $n = $newn;
+    }
+}
