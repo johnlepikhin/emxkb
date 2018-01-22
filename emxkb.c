@@ -118,17 +118,17 @@ int send_key_to_emacs(Display *display, int window_id, int group)
     event.display = display;
     event.root    = RootWindow(display, DefaultScreen(display));
     event.state   = 0;
-    event.keycode = XKeysymToKeycode(display, XStringToKeysym("space"));
+    event.keycode = XKeysymToKeycode(display, XStringToKeysym("backslash"));
 
     switch (group)
     {
     case 0:
         event.state = Mod4Mask;
-        /* event.keycode = XKeysymToKeycode(display, XStringToKeysym("F31")); */
+//        event.keycode = XKeysymToKeycode(display, XStringToKeysym("F31"));
         break;
     case 1:
-        event.state = Mod3Mask;
-        /* event.keycode = XKeysymToKeycode(display, XStringToKeysym("F32")); */
+        event.state = ControlMask;
+//        event.keycode = XKeysymToKeycode(display, XStringToKeysym("F32"));
         break;
     default:
         event.state = Mod4Mask;
